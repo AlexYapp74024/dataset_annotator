@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="buttons">
+    <file>Discard.png</file>
+    <file>Fill.png</file>
+    <file>Fit.png</file>
+    <file>Flip Horizontal.png</file>
+    <file>Flip Vertical.png</file>
+    <file>Next.png</file>
+    <file>Open.png</file>
+    <file>Prev.png</file>
+    <file>Rotate 90.png</file>
+    <file>Rotate 270.png</file>
+    <file>Save.png</file>
+  </qresource>
+  <qresource prefix="main">
+    <file>Crop.ico</file>
+  </qresource>
+</RCC>

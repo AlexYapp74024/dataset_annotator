@@ -1,0 +1,30 @@
+9-May	Lunch	Meals (outside)	9.50
+9-May	Transport	Transport	4.00
+9-May	Dinner	Meals (In uni)	6.00
+10-May	Lunch	Meals (In uni)	5.00
+10-May	Transport	Transport	5.60
+10-May	Dinner	Meals (In uni)	5.00
+11-May	Lunch	Meals (In uni)	6.00
+11-May	Dinner	Meals (outside)	8.50
+11-May	Transport	Transport	9.33
+11-May	Arcade top up	Games	20.00
+11-May	Groceries	Food	39.90
+12-May	Lunch	Meals (In uni)	3.50
+12-May	Dinner	Meals (In uni)	5.50
+12-May	Transport	Transport	5.60
+12-May	Arcade top up	Games	20.00
+12-May	Milk Tea	Food	9.90
+13-May	Lunch	Meals (In uni)	6.00
+13-May	Dinner	Meals (In uni)	12.00
+14-May	Lunch	Meals (In uni)	6.00
+14-May	Dinner	Meals (In uni)	23.30
+14-May	Transport	Transport	9.00
+15-May	Lunch	Meals (In uni)	6.00
+15-May	Transport	Transport	6.00
+15-May	Dinner	Meals (In uni)	6.00
+16-May	Lunch	Meals (In uni)	6.00
+16-May	Dinner	Meals (In uni)	6.00
+17-May	Lunch	Meals (In uni)	5.00
+17-May	Dinner	Meals (In uni)	6.00
+17-May	Laundry	Chores	10.00
+17-May	Outstanding rent	Utilities	202.58
