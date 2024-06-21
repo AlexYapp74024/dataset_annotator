@@ -1,3 +1,1 @@
-settings = {   'default_open_path': 'C:/Alex/Image Cropper/pixiv',
-    'default_save_path': 'C:\\Alex\\Image Cropper\\cropped',
-    'delete_original_image': False}
+settings = {'project_dir': 'C:/Alex/Repo/dataset_annotator/test_data'}

@@ -1,37 +1,27 @@
-from PySide6 import (
-    QtWidgets as qtw, 
-    QtGui as qtg, 
-    QtCore as qtc,
-)
-from PySide6.QtCore import Qt
-from typing import Callable
+from __future__ import annotations
 
-class TableAutoComplete(qtw.QStyledItemDelegate):
-    def __init__(self, list_fn: Callable[[None], list[str]]) -> None:
-        super().__init__()
-        self.list_fn = list_fn
+import cv2
+from hashlib import md5
+from skimage.color import hsv2rgb
+import numpy as np
 
-    def createEditor(self, parent, option, index):
-        editor = qtw.QLineEdit(parent)
-        autoCompleter = qtw.QCompleter(self.list_fn(), parent)
-        autoCompleter.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        autoCompleter.setFilterMode(Qt.MatchFlag.MatchContains)
-        editor.setCompleter(autoCompleter)
-        return editor
-    
-class CurrencyInputMask(qtw.QStyledItemDelegate):
-    def __init__(self) -> None:
-        super().__init__()
+def hash_to_hue(label:str) -> np.ndarray:
+    hash = md5(label.encode()).hexdigest()
+    hue = int(hash[:2],16)
+    color = (hsv2rgb(np.array([[[hue/255.,1.,1.]]])) * 255)[0][0]
+    return color
 
-    def createEditor(self, parent, option, index):
-        editor = super().createEditor(parent, option, index)
-        if isinstance(editor, qtw.QLineEdit):
-            validator = qtg.QRegularExpressionValidator(
-                qtc.QRegularExpression(r"[0-9]*[.]{0,1}[0-9]{0,2}"), editor
-            )
-            editor.setValidator(validator)
-        return editor
-    
-def align_text_right(item: qtw.QTableWidgetItem):
-    item.setTextAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignRight)
-    return item
+def remove_stray_pixels(image:np.ndarray) -> np.ndarray:
+        input_image = cv2.threshold(image, 254, 255, cv2.THRESH_BINARY)[1]
+        input_image_comp = cv2.bitwise_not(input_image)  # could just use 255-img
+
+        kernel1 = np.array([[0, 0, 0],
+                            [0, 1, 0],
+                            [0, 0, 0]], np.uint8)
+        kernel2 = np.array([[1, 1, 1],
+                            [1, 0, 1],
+                            [1, 1, 1]], np.uint8)
+
+        hitormiss1 = cv2.morphologyEx(input_image, cv2.MORPH_ERODE, kernel1)
+        hitormiss2 = cv2.morphologyEx(input_image_comp, cv2.MORPH_ERODE, kernel2)
+        return cv2.bitwise_and(hitormiss1, cv2.bitwise_not(hitormiss2))

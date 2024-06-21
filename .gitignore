@@ -1,7 +1,12 @@
 **/__pycache__
 .vscode/**
+.vscode/
 *.png
 *.jpg
 main.spec
 build/**
 dist/**
+test_data/**
+test_data/*
+test_data/
+*.pth
