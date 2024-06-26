@@ -10,15 +10,24 @@ from segment_anything import sam_model_registry, SamPredictor, SamAutomaticMaskG
 from segment_anything.modeling import Sam
 from typing import Callable
 
+from PySide6 import (
+    QtWidgets as qtw, 
+    QtGui as qtg, 
+    QtCore as qtc,
+)
+from PySide6.QtCore import Qt
+
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class SAM_wrapper():
     SAM_LINK = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
     SAM_FILE = "sam_vit_b.pth"
 
-    def __init__(self) -> None:
+    def __init__(self, confirm_download_callback: Callable[[],bool] = lambda _ : True) -> None:
         self.sam : Sam = None
-        self.detections : sv.Detections = None
+        
+        if self.sam is None: 
+            self.load_model(confirm_download_callback)
 
     def download_model(self):
         # Streaming, so we can iterate over the response.
@@ -48,12 +57,10 @@ class SAM_wrapper():
         self.mask_generator = SamAutomaticMaskGenerator(self.sam)
         # self.sam_predictor = SamPredictor(self.sam)
 
-    def segment(self, image: np.ndarray, confirm_download_callback: Callable[[],bool]) -> np.ndarray:
-        if self.sam is None: 
-            self.load_model(confirm_download_callback)
-
+    def segment(self, image: np.ndarray) -> tuple[sv.Detections, np.ndarray]:
         sam_result = self.mask_generator.generate(image)
         mask_annotator = sv.MaskAnnotator(color_lookup=sv.ColorLookup.INDEX)
-        self.detections = sv.Detections.from_sam(sam_result)
-        annotated_images = mask_annotator.annotate(scene=image.copy(), detections=self.detections)
-        return annotated_images
+        detections = sv.Detections.from_sam(sam_result)
+        annotated_images = mask_annotator.annotate(scene=image.copy(), detections=detections)
+        return detections, annotated_images
+    

@@ -42,6 +42,9 @@ class MainApp(qtw.QMainWindow, Ui_MainWindow):
         self.graphicsView.setScene(self.scene)
         self.scene.labels_changed.connect(self.update_list)
         self.scene.image_changed.connect(lambda : (self.graphicsView.resize(self.graphicsView.size()*1.1), self.graphicsView.resize(self.graphicsView.size()/1.1)))
+        self.scene.status_update.connect(self.statusBar.showMessage)
+        
+        self.proj_manager.image_updated.connect(self.scene.open_image_file)
 
         self.pb_add_class.clicked.connect(self.add_label_dialog)
         self.pb_open_proj.clicked.connect(self.change_project_dir_dialog)
@@ -138,7 +141,7 @@ class MainApp(qtw.QMainWindow, Ui_MainWindow):
     def setup_page_count(self):
         self.page_frame.show()
         self.le_page.setEnabled(True)
-        max_page : int = len(self.proj_manager.images_paths)
+        max_page : int = len(self.proj_manager.image_paths)
 
         self.lb_pageMax.setText(f" / {max_page}")
         self.le_page.setInputMask("0" * len(str(max_page)))
@@ -155,12 +158,11 @@ class MainApp(qtw.QMainWindow, Ui_MainWindow):
         if page < 0:
             page = 0
             self.le_page.setText(f"{page}")
-        if page > (max_page := len(self.proj_manager.images_paths)):
+        if page > (max_page := len(self.proj_manager.image_paths)):
             page = max_page
             self.le_page.setText(f"{page}")
         
         self.proj_manager.index = page
-        self.scene.open_image_file(self.proj_manager.image_path, self.proj_manager.label_path)
 
     def segment(self):
         def confirm():

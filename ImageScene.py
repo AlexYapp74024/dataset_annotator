@@ -24,7 +24,8 @@ class ImageScene(qtw.QGraphicsScene):
     
     image_changed = qtc.Signal()
     labels_changed = qtc.Signal()
-    
+    status_update = qtc.Signal(str)
+
     clicked = qtc.Signal(int,int, Qt.KeyboardModifier)
     released = qtc.Signal(int,int, Qt.KeyboardModifier)
     moved = qtc.Signal(int,int, Qt.KeyboardModifier)
@@ -36,7 +37,7 @@ class ImageScene(qtw.QGraphicsScene):
         
         self.proj_manager = proj_manager
         self._original_image : np.ndarray = None
-        self._processed_image : np.ndarray = None
+        self._processed_image : np.ndarray|None = None
         self._label_path : Path = None
         self.show_processed : bool = False
         self.scale : float = 1.0
@@ -61,6 +62,7 @@ class ImageScene(qtw.QGraphicsScene):
             torch.cuda.empty_cache()
 
         self.label_manager = label_manager()
+
         self.clicked.connect(self.label_manager.clicked)
         self.released.connect(self.label_manager.released)
         self.moved.connect(self.label_manager.moved)
@@ -69,16 +71,17 @@ class ImageScene(qtw.QGraphicsScene):
 
         self.label_manager.temp_bbox_update.connect(self.temp_bbox_update)
         self.label_manager.label_created.connect(self.bbox_update)
+        self.proj_manager.label_manager_changed(self.label_manager)
+        self.status_update.emit(f"{self.label_manager.help_text}")
         
         if self._original_image is not None:
-            self._processed_image = self.label_manager.process_image(self._original_image)
             self.draw_bboxes()
 
-    def open_image_file(self, image_path:Path, label_path:Path):
-        image_path = cv2.imread(str(image_path))
-        image = cv2.cvtColor(image_path, cv2.COLOR_BGR2RGB)
+    def open_image_file(self, image_path:Path, label_path:Path, cache: dict = None):
+        image = cv2.imread(str(image_path))
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         self.image = image
-        self._processed_image = self.label_manager.process_image(image)
+        self._processed_image = self.label_manager.load_cache(cache) if cache is not None else image
         
         self._label_path = label_path
         if os.path.exists(self._label_path):
@@ -88,7 +91,13 @@ class ImageScene(qtw.QGraphicsScene):
         self.labels_changed.emit()
         self.current_label_index = None
         self.draw_bboxes()
+        
         self.current_rect.hide()
+
+        if cache is None:
+            self.status_update.emit(f"Processing current image - {self.label_manager.help_text}")
+        else:
+            self.status_update.emit(f"{self.label_manager.help_text}")
 
     def update_label_file(self):
         with open(self._label_path, 'w') as file:
@@ -110,7 +119,10 @@ class ImageScene(qtw.QGraphicsScene):
 
     @property
     def image(self) -> np.ndarray:
-        return self._processed_image if self.show_processed else self._original_image 
+        if (self.show_processed and self._processed_image is not None):
+            return self._processed_image
+        else:
+            return self._original_image
     
     @image.setter
     def image(self, image:np.ndarray):

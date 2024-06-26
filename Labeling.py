@@ -67,8 +67,14 @@ class LabelManager(qtc.QObject):
     temp_bbox_update = qtc.Signal(qtc.QRect)
     label_created = qtc.Signal(qtc.QRect)
 
+    @property
+    def help_text(self) -> str: pass
+    
     @abstractmethod
-    def process_image(self, image: np.ndarray): pass
+    def save_cache(self, image: np.ndarray) -> dict: pass
+    
+    @abstractmethod
+    def load_cache(self, cache: dict) -> np.ndarray: pass
 
     @abstractmethod
     def clicked(self, x:int, y:int, mod: Qt.KeyboardModifier): pass
@@ -95,8 +101,15 @@ class DefaultLabeling(LabelManager):
         self.corner1 : Tuple[int,int] = None
         self.corner2 : Tuple[int,int] = None
 
-    def process_image(self, image: np.ndarray) -> np.ndarray: 
-        return image
+    @property
+    def help_text(self) -> str: 
+        return "Click and Drag to draw BBox | ESC or DEL to delete selected BBox"
+
+    def save_cache(self, image: np.ndarray) -> dict: 
+        return {"image": image}
+    
+    def load_cache(self, image: np.ndarray) -> np.ndarray: 
+        return image["image"]
 
     def clicked(self, x:int, y:int, mod: Qt.KeyboardModifier): 
         self.corner1 = (x,y)
@@ -125,11 +138,22 @@ class SAMLabeling(LabelManager):
     def __init__(self):
         super().__init__()
         self.sam = SAM_wrapper()
+        self.detection = None
         self._default_xywh = (-10,-10,0,0)
         self.xywhs = []
 
-    def process_image(self, image: np.ndarray): 
-        return self.sam.segment(image, lambda : True)
+    @property
+    def help_text(self) -> str: 
+        return "Click on 'Process' to see segments | click to select segments | CTRL-Click to combine segments | ALT-Click to exclude segment | Enter to commit BBox creation"
+
+    def save_cache(self, image: np.ndarray) -> dict: 
+        detection , image = self.sam.segment(image)
+        return {"detection": detection,
+                "image": image}
+    
+    def load_cache(self, cache: dict) -> np.ndarray: 
+        self.detections = cache["detection"]
+        return cache["image"]
 
     def clicked(self, x:int, y:int, mod: Qt.KeyboardModifier): 
         pass
@@ -185,7 +209,7 @@ class SAMLabeling(LabelManager):
         
         
     def get_segmentation(self, x:int, y:int) -> Tuple:
-        d = self.sam.detections
+        d = self.detections
         masked_indices = np.where(d.mask[:,y,x])
         masks = np.take(d.mask, masked_indices, axis=0)[0] * 255.
         masks = [remove_stray_pixels(masks[i]) for i in range(len(masks))]
