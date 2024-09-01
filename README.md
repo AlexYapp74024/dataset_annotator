@@ -8,7 +8,5 @@ Basic Dataset annotation tool for object detection dataset, developed for person
 
 https://github.com/user-attachments/assets/b7685650-ac6c-48c0-b903-a7a1e5f504d9
 
-(Still in development)
-
-
+Still in development . . . (most basic features working, but many bugs still exists)
 
