@@ -7,3 +7,7 @@ Basic Dataset annotation tool for object detection dataset, developed for person
 - Can use SAM to generate bounding boxes
 
 (Still in development)
+
+![](https://github.com/user-attachments/assets/b7685650-ac6c-48c0-b903-a7a1e5f504d9)
+
+
