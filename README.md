@@ -6,8 +6,9 @@ Basic Dataset annotation tool for object detection dataset, developed for person
 - Use pretrained models to assist in annotations
 - Can use SAM to generate bounding boxes
 
+https://github.com/user-attachments/assets/b7685650-ac6c-48c0-b903-a7a1e5f504d9
+
 (Still in development)
 
-![](https://github.com/user-attachments/assets/b7685650-ac6c-48c0-b903-a7a1e5f504d9)
 
 
