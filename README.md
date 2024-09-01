@@ -5,3 +5,5 @@ Basic Dataset annotation tool for object detection dataset, developed for person
 Basic bouding box labeling
 Use pretrained models to assist in annotations
 Can use SAM to generate bounding boxes
+
+(Still in development)
